@@ -1,17 +1,30 @@
 package cmd
 
 import (
+	"log"
 	"os"
 
+	b "github.com/DKeshavarz/peyk/internal/bot"
+	"github.com/DKeshavarz/peyk/internal/config"
+	"github.com/DKeshavarz/peyk/internal/infra/bot"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "peyk",
 	Short: "A platform that connects different messaging apps together",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg := config.New()
+
+		telebot, err := bot.New(&cfg.Telebot)
+		if err != nil {
+			log.Printf("can't create telegram bot: %s\n", err.Error())
+		}
+
+		b.Start(telebot)
+		
+		return nil
+	},
 }
 
 func Execute() {
@@ -22,5 +35,3 @@ func Execute() {
 }
 
 func init() {}
-
-

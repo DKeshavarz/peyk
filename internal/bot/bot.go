@@ -7,7 +7,9 @@ import (
 )
 
 func Start(bot *tele.Bot) {
-
+	if bot == nil {
+		return 
+	}
 	bot.Handle("/start", func(c tele.Context) error {
 		
 		if c.Chat().Type == tele.ChatGroup || c.Chat().Type == tele.ChatSuperGroup {
