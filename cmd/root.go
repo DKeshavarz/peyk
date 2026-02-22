@@ -7,6 +7,7 @@ import (
 
 	b "github.com/DKeshavarz/peyk/internal/bot"
 	"github.com/DKeshavarz/peyk/internal/config"
+	"github.com/DKeshavarz/peyk/internal/domain"
 	"github.com/DKeshavarz/peyk/internal/infra/bot"
 	"github.com/DKeshavarz/peyk/internal/infra/cache"
 
@@ -32,7 +33,7 @@ var rootCmd = &cobra.Command{
 		codeRepo := cache_repo.NewConnectionCodeRepository(cache)
 		
 		connection := service.NewConnectionUsecase(codeGen, codeRepo, 5*time.Minute)
-		b.Start(telebot, connection)
+		b.Start(telebot, connection, domain.Telegram)
 
 		return nil
 	},

@@ -3,11 +3,12 @@ package bot
 import (
 	"log"
 
+	"github.com/DKeshavarz/peyk/internal/domain"
 	"github.com/DKeshavarz/peyk/internal/service"
 	tele "gopkg.in/telebot.v4"
 )
 
-func Start(bot *tele.Bot, connection service.ConnectionUsecase) {
+func Start(bot *tele.Bot, connection service.ConnectionUsecase, platform domain.PlatformName) {
 	if bot == nil {
 		return
 	}
@@ -24,9 +25,9 @@ func Start(bot *tele.Bot, connection service.ConnectionUsecase) {
 		return c.Send("This bot has only one command: /start\nIt works in both private chats and groups!")
 	})
 
-	h := New(connection)
+	h := New(connection, platform)
 	bot.Handle("/gen", h.generateCode)
-	
+
 	log.Println("Bot started successfully!")
 	bot.Start()
 }
