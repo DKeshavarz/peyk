@@ -24,6 +24,7 @@ func Start(bot *tele.Bot) {
 		return c.Send("This bot has only one command: /start\nIt works in both private chats and groups!")
 	})
 
+	
 
 	
 	log.Println("Bot started successfully!")
