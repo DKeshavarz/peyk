@@ -12,3 +12,18 @@ type Platform struct {
 	Name   string
 	Status PlatformStatus
 }
+
+type PlatformName string
+
+const (
+	Telegram PlatformName = "telegram"
+	Bale     PlatformName = "bale"
+)
+
+func (p PlatformName) Valid() bool {
+	switch p {
+	case Telegram, Bale:
+		return true
+	}
+	return false
+}

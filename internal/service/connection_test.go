@@ -17,23 +17,27 @@ func TestGenerateCode(t *testing.T) {
 		genErr       error
 		repoErr      error
 		sourceChatID string
+		platform     domain.PlatformName
 		wantErr      bool
 	}{
 		{
 			name:         "success",
 			genCode:      "ABC123",
 			sourceChatID: "chat-1",
+			platform:     domain.Telegram,
 			wantErr:      false,
 		},
 		{
 			name:    "generator fails",
 			genErr:  errors.New("gen failed"),
+			platform:     domain.Telegram,
 			wantErr: true,
 		},
 		{
 			name:         "repo fails",
 			genCode:      "XYZ999",
 			repoErr:      errors.New("db error"),
+			platform:     domain.Telegram,
 			sourceChatID: "chat-2",
 			wantErr:      true,
 		},
@@ -46,7 +50,7 @@ func TestGenerateCode(t *testing.T) {
 
 			u := NewConnectionUsecase(gen, repo, time.Minute)
 
-			code, err := u.GenerateCode(context.Background(), tt.sourceChatID)
+			code, err := u.GenerateCode(context.Background(), tt.sourceChatID, tt.platform)
 
 			if tt.wantErr && err == nil {
 				t.Fatalf("expected error, got nil")
@@ -63,7 +67,7 @@ func TestGenerateCode(t *testing.T) {
 				if repo.saved == nil {
 					t.Fatalf("expected code to be saved")
 				}
-				if repo.saved.SourceChat != tt.sourceChatID {
+				if repo.saved.ChatID != tt.sourceChatID {
 					t.Fatalf("wrong source chat saved")
 				}
 			}

@@ -16,7 +16,7 @@ type ConnectionCodeRepository interface {
 }
 
 type ConnectionUsecase interface {
-	GenerateCode(ctx context.Context, sourceChatID string) (code string, err error)
+	GenerateCode(ctx context.Context, sourceChatID string, platform domain.PlatformName) (code string, err error)
 }
 
 type connectionUsecase struct {
@@ -35,7 +35,7 @@ func NewConnectionUsecase(codeGen CodeGenerator, codeRepo ConnectionCodeReposito
 	}
 }
 
-func (u *connectionUsecase) GenerateCode(ctx context.Context, sourceChatID string) (string, error) {
+func (u *connectionUsecase) GenerateCode(ctx context.Context, sourceChatID string, platform domain.PlatformName) (string, error) {
 
 	code, err := u.codeGen.Generate()
 	if err != nil {
@@ -43,9 +43,10 @@ func (u *connectionUsecase) GenerateCode(ctx context.Context, sourceChatID strin
 	}
 
 	cc := &domain.ConnectionCode{
-		Code:       code,
-		SourceChat: sourceChatID,
-		ExpiresAt:  u.now().Add(u.ttl),
+		Code:      code,
+		ChatID:    sourceChatID,
+		Platform:  platform,
+		ExpiresAt: u.now().Add(u.ttl),
 	}
 
 	if err := u.codeRepo.Save(ctx, cc); err != nil {
