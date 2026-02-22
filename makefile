@@ -33,6 +33,16 @@ push: ## Push current branch to origin
 pull: ## Pull current branch from origin
 	git pull origin $(BRANCH)
 
+image: ## build an image from docker file
+	docker build -t $(PROJECT_NAME):$(TEST_TAG) $(DOCKER_FILE_PATH) 
+
+drun: ## make dokcer run the image
+	docker run --name $(PROJECT_NAME)_$(TEST_TAG) --env-file .env -p 8080:8080 -d $(PROJECT_NAME):$(TEST_TAG)
+
+dstop: ## delete and stop continer
+	docker stop $(PROJECT_NAME)_$(TEST_TAG)
+	docker rm $(PROJECT_NAME)_$(TEST_TAG)
+	
 help: ## Show this help
 	@echo "Usage: make [target]"
 	@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_-]+:.*##/ {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
