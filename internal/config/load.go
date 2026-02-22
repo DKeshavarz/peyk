@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/caarlos0/env/v11"
@@ -18,5 +19,6 @@ func New() *Config {
 		log.Fatal(err)
 	}
 	
+	fmt.Println(cfg.Balebot)
 	return &cfg
 }

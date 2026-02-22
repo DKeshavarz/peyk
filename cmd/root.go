@@ -24,17 +24,21 @@ var rootCmd = &cobra.Command{
 		cfg := config.New()
 
 		telebot, err := bot.New(&cfg.Telebot)
-		cache := cache.New()
 		if err != nil {
 			log.Printf("can't create telegram bot: %s\n", err.Error())
 		}
+		balebot, err := bot.New(&cfg.Balebot)
+		if err != nil {
+			log.Printf("can't create bale bot: %s\n", err.Error())
+		}
+		cache := cache.New()
 
 		codeGen := codegen.NewCodeGenerator()
 		codeRepo := cache_repo.NewConnectionCodeRepository(cache)
 		
 		connection := service.NewConnectionUsecase(codeGen, codeRepo, 5*time.Minute)
-		b.Start(telebot, connection, domain.Telegram)
-
+		go b.Start(telebot, connection, domain.Telegram)
+		b.Start(balebot, connection, domain.Bale)
 		return nil
 	},
 }
