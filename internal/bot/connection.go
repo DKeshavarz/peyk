@@ -25,8 +25,13 @@ func (h *Handler) generateCode(c tele.Context) error {
 	ctx := context.Background()
 	strID := fmt.Sprintf("%d", c.Chat().ID)
 	code, err := h.connection.GenerateCode(ctx, strID, h.platform)
+
+	msg := `کد موقت گروه
+	%s`
+
+
 	if err != nil {
 		c.Send("somthing happend %s", err.Error())
 	}
-	return c.Send(code)
+	return c.Send(fmt.Sprintf(msg, code))
 }
