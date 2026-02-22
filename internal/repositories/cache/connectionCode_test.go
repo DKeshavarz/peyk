@@ -26,9 +26,9 @@ func TestConnectionCodeRepository_Save(t *testing.T) {
 		{
 			name: "successful save",
 			code: &domain.ConnectionCode{
-				Code:       "TEST-123",
-				SourceChat: "chat_1",
-				ExpiresAt:  time.Now().Add(5 * time.Minute),
+				Code:      "TEST-123",
+				ChatID:    "chat_1",
+				ExpiresAt: time.Now().Add(5 * time.Minute),
 			},
 			wantErr: false,
 		},
@@ -40,29 +40,29 @@ func TestConnectionCodeRepository_Save(t *testing.T) {
 		{
 			name: "expired code",
 			code: &domain.ConnectionCode{
-				Code:       "EXPIRED-123",
-				SourceChat: "chat_2",
-				ExpiresAt:  time.Now().Add(-5 * time.Minute),
+				Code:      "EXPIRED-123",
+				ChatID:    "chat_2",
+				ExpiresAt: time.Now().Add(-5 * time.Minute),
 			},
 			wantErr: true,
 		},
 		{
 			name: "zero TTL code",
 			code: &domain.ConnectionCode{
-				Code:       "ZERO-123",
-				SourceChat: "chat_3",
-				ExpiresAt:  time.Now(), 
+				Code:      "ZERO-123",
+				ChatID:    "chat_3",
+				ExpiresAt: time.Now(),
 			},
 			wantErr: true,
 		},
 		{
 			name: "empty code string",
 			code: &domain.ConnectionCode{
-				Code:       "",
-				SourceChat: "chat_4",
-				ExpiresAt:  time.Now().Add(5 * time.Minute),
+				Code:      "",
+				ChatID:    "chat_4",
+				ExpiresAt: time.Now().Add(5 * time.Minute),
 			},
-			wantErr: false, 
+			wantErr: false,
 		},
 	}
 
@@ -80,7 +80,7 @@ func TestConnectionCodeRepository_Save(t *testing.T) {
 					saved, err := repo.FindByCode(ctx, tt.code.Code)
 					assert.NoError(t, err)
 					assert.Equal(t, tt.code.Code, saved.Code)
-					assert.Equal(t, tt.code.SourceChat, saved.SourceChat)
+					assert.Equal(t, tt.code.ChatID, saved.ChatID)
 					assert.WithinDuration(t, tt.code.ExpiresAt, saved.ExpiresAt, time.Second)
 				}
 			}
@@ -94,19 +94,18 @@ func TestConnectionCodeRepository_Save_Overwrite(t *testing.T) {
 	ctx := context.Background()
 
 	code1 := &domain.ConnectionCode{
-		Code:       "SAME-CODE",
-		SourceChat: "chat_1",
-		ExpiresAt:  time.Now().Add(5 * time.Minute),
+		Code:      "SAME-CODE",
+		ChatID:    "chat_1",
+		ExpiresAt: time.Now().Add(5 * time.Minute),
 	}
 
 	err := repo.Save(ctx, code1)
 	require.NoError(t, err)
 
-	
 	code2 := &domain.ConnectionCode{
-		Code:       "SAME-CODE",
-		SourceChat: "chat_2",                         
-		ExpiresAt:  time.Now().Add(10 * time.Minute), 
+		Code:      "SAME-CODE",
+		ChatID:    "chat_2",
+		ExpiresAt: time.Now().Add(10 * time.Minute),
 	}
 
 	err = repo.Save(ctx, code2)
@@ -115,7 +114,7 @@ func TestConnectionCodeRepository_Save_Overwrite(t *testing.T) {
 	saved, err := repo.FindByCode(ctx, "SAME-CODE")
 	assert.NoError(t, err)
 	assert.Equal(t, "SAME-CODE", saved.Code)
-	assert.Equal(t, "chat_2", saved.SourceChat) 
+	assert.Equal(t, "chat_2", saved.ChatID)
 	assert.WithinDuration(t, code2.ExpiresAt, saved.ExpiresAt, time.Second)
 }
 
@@ -126,14 +125,14 @@ func TestConnectionCodeRepository_FindByCode(t *testing.T) {
 
 	testCodes := []*domain.ConnectionCode{
 		{
-			Code:       "FIND-001",
-			SourceChat: "chat_1",
-			ExpiresAt:  time.Now().Add(5 * time.Minute),
+			Code:      "FIND-001",
+			ChatID:    "chat_1",
+			ExpiresAt: time.Now().Add(5 * time.Minute),
 		},
 		{
-			Code:       "FIND-002",
-			SourceChat: "chat_2",
-			ExpiresAt:  time.Now().Add(10 * time.Minute),
+			Code:      "FIND-002",
+			ChatID:    "chat_2",
+			ExpiresAt: time.Now().Add(10 * time.Minute),
 		},
 	}
 
@@ -154,7 +153,7 @@ func TestConnectionCodeRepository_FindByCode(t *testing.T) {
 			wantErr: false,
 			checkFunc: func(t *testing.T, found *domain.ConnectionCode) {
 				assert.Equal(t, "FIND-001", found.Code)
-				assert.Equal(t, "chat_1", found.SourceChat)
+				assert.Equal(t, "chat_1", found.ChatID)
 			},
 		},
 		{
@@ -163,7 +162,7 @@ func TestConnectionCodeRepository_FindByCode(t *testing.T) {
 			wantErr: false,
 			checkFunc: func(t *testing.T, found *domain.ConnectionCode) {
 				assert.Equal(t, "FIND-002", found.Code)
-				assert.Equal(t, "chat_2", found.SourceChat)
+				assert.Equal(t, "chat_2", found.ChatID)
 			},
 		},
 		{
@@ -203,9 +202,9 @@ func TestConnectionCodeRepository_FindByCode_Expired(t *testing.T) {
 
 	// Save a code that expires soon
 	code := &domain.ConnectionCode{
-		Code:       "EXPIRING",
-		SourceChat: "chat_expire",
-		ExpiresAt:  time.Now().Add(2 * time.Second),
+		Code:      "EXPIRING",
+		ChatID:    "chat_expire",
+		ExpiresAt: time.Now().Add(2 * time.Second),
 	}
 
 	err := repo.Save(ctx, code)
@@ -240,9 +239,9 @@ func TestConnectionCodeRepository_Delete(t *testing.T) {
 			name: "delete existing code",
 			setup: func() string {
 				code := &domain.ConnectionCode{
-					Code:       "DELETE-001",
-					SourceChat: "chat_delete",
-					ExpiresAt:  time.Now().Add(5 * time.Minute),
+					Code:      "DELETE-001",
+					ChatID:    "chat_delete",
+					ExpiresAt: time.Now().Add(5 * time.Minute),
 				}
 				err := repo.Save(ctx, code)
 				require.NoError(t, err)
@@ -279,9 +278,9 @@ func TestConnectionCodeRepository_Delete(t *testing.T) {
 			name: "delete twice",
 			setup: func() string {
 				code := &domain.ConnectionCode{
-					Code:       "DELETE-TWICE",
-					SourceChat: "chat_twice",
-					ExpiresAt:  time.Now().Add(5 * time.Minute),
+					Code:      "DELETE-TWICE",
+					ChatID:    "chat_twice",
+					ExpiresAt: time.Now().Add(5 * time.Minute),
 				}
 				err := repo.Save(ctx, code)
 				require.NoError(t, err)
@@ -320,8 +319,6 @@ func TestConnectionCodeRepository_Delete(t *testing.T) {
 	}
 }
 
-
-
 func TestConnectionCodeRepository_DataIntegrity(t *testing.T) {
 	c := cache.New()
 	repo := NewConnectionCodeRepository(c)
@@ -336,33 +333,33 @@ func TestConnectionCodeRepository_DataIntegrity(t *testing.T) {
 		{
 			name: "special characters in code",
 			code: &domain.ConnectionCode{
-				Code:       "TEST-@#$%-123",
-				SourceChat: "chat_special",
-				ExpiresAt:  time.Now().Add(5 * time.Minute),
+				Code:      "TEST-@#$%-123",
+				ChatID:    "chat_special",
+				ExpiresAt: time.Now().Add(5 * time.Minute),
 			},
 		},
 		{
 			name: "unicode in source chat",
 			code: &domain.ConnectionCode{
-				Code:       "UNICODE-001",
-				SourceChat: "چت_فارسی_123",
-				ExpiresAt:  time.Now().Add(5 * time.Minute),
+				Code:      "UNICODE-001",
+				ChatID:    "چت_فارسی_123",
+				ExpiresAt: time.Now().Add(5 * time.Minute),
 			},
 		},
 		{
 			name: "very long code",
 			code: &domain.ConnectionCode{
-				Code:       "THIS-IS-A-VERY-LONG-CODE-THAT-MIGHT-CAUSE-ISSUES-1234567890",
-				SourceChat: "chat_long",
-				ExpiresAt:  time.Now().Add(5 * time.Minute),
+				Code:      "THIS-IS-A-VERY-LONG-CODE-THAT-MIGHT-CAUSE-ISSUES-1234567890",
+				ChatID:    "chat_long",
+				ExpiresAt: time.Now().Add(5 * time.Minute),
 			},
 		},
 		{
 			name: "very long source chat",
 			code: &domain.ConnectionCode{
-				Code:       "LONG-SRC-001",
-				SourceChat: "this-is-a-very-long-source-chat-id-that-might-cause-issues-1234567890",
-				ExpiresAt:  time.Now().Add(5 * time.Minute),
+				Code:      "LONG-SRC-001",
+				ChatID:    "this-is-a-very-long-source-chat-id-that-might-cause-issues-1234567890",
+				ExpiresAt: time.Now().Add(5 * time.Minute),
 			},
 		},
 	}
@@ -377,7 +374,7 @@ func TestConnectionCodeRepository_DataIntegrity(t *testing.T) {
 			found, err := repo.FindByCode(ctx, tc.code.Code)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.code.Code, found.Code)
-			assert.Equal(t, tc.code.SourceChat, found.SourceChat)
+			assert.Equal(t, tc.code.ChatID, found.ChatID)
 			assert.WithinDuration(t, tc.code.ExpiresAt, found.ExpiresAt, time.Second)
 
 			// Marshal/Unmarshal test
