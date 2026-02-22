@@ -1,15 +1,12 @@
 package cmd
 
 import (
-	"log"
 	"os"
 	"time"
 
 	b "github.com/DKeshavarz/peyk/internal/bot"
 	"github.com/DKeshavarz/peyk/internal/config"
 	"github.com/DKeshavarz/peyk/internal/domain"
-	"github.com/DKeshavarz/peyk/internal/infra/bot"
-	"github.com/DKeshavarz/peyk/internal/infra/cache"
 
 	cache_repo "github.com/DKeshavarz/peyk/internal/repositories/cache"
 	"github.com/DKeshavarz/peyk/internal/service"
@@ -23,22 +20,14 @@ var rootCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := config.New()
 
-		telebot, err := bot.New(&cfg.Telebot)
-		if err != nil {
-			log.Printf("can't create telegram bot: %s\n", err.Error())
-		}
-		balebot, err := bot.New(&cfg.Balebot)
-		if err != nil {
-			log.Printf("can't create bale bot: %s\n", err.Error())
-		}
-		cache := cache.New()
+		infra := newInfra(cfg)
 
 		codeGen := codegen.NewCodeGenerator()
-		codeRepo := cache_repo.NewConnectionCodeRepository(cache)
-		
+		codeRepo := cache_repo.NewConnectionCodeRepository(infra.cache)
+
 		connection := service.NewConnectionUsecase(codeGen, codeRepo, 5*time.Minute)
-		go b.Start(telebot, connection, domain.Telegram)
-		b.Start(balebot, connection, domain.Bale)
+		go b.Start(infra.telebot, connection, domain.Telegram)
+		b.Start(infra.balebot, connection, domain.Bale)
 		return nil
 	},
 }
