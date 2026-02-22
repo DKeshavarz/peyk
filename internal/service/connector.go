@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/DKeshavarz/peyk/internal/domain"
@@ -37,6 +38,9 @@ func NewConnectionUsecase(codeGen CodeGenerator, codeRepo ConnectionCodeReposito
 
 func (u *connectionUsecase) GenerateCode(ctx context.Context, sourceChatID string, platform domain.PlatformName) (string, error) {
 
+	if !platform.Valid() {
+		return "", errors.New("invalid platform request")
+	}
 	code, err := u.codeGen.Generate()
 	if err != nil {
 		return "", err

@@ -41,6 +41,13 @@ func TestGenerateCode(t *testing.T) {
 			sourceChatID: "chat-2",
 			wantErr:      true,
 		},
+		{
+			name:         "invalid platform",
+			genCode:      "XYZ999",
+			sourceChatID: "chat-2",
+			platform:     "bad platform",
+			wantErr:      true,
+		},
 	}
 
 	for _, tt := range tests {
