@@ -12,6 +12,12 @@ type Handler struct {
 	connection service.ConnectionUsecase
 }
 
+func New(connection service.ConnectionUsecase) *Handler {
+	return &Handler{
+		connection: connection,
+	}
+}
+
 func (h *Handler) generateCode(c tele.Context) error {
 	ctx := context.Background()
 	strID := fmt.Sprintf("%d", c.Chat().ID)
