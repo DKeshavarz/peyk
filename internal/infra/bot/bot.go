@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	API   string
-	Token string
+	API   string `env:"API"`
+	Token string `env:"TOKEN"`
 }
 
 func New(cfg *Config) (bot *tele.Bot, err error) {
